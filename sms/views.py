@@ -2,15 +2,16 @@ import re
 
 from django.core.validators import RegexValidator
 from django.forms import Form, ChoiceField, Textarea
-from django.forms.fields import CharField, IPAddressField
+from django.forms.fields import CharField
 from django.views.generic import FormView
-from django.views.generic.base import TemplateView
 from requests.exceptions import RequestException
 
 from .base import SMSGate
 
 tel_re = re.compile(r'^\+\d{11}$')
 validate_tel = RegexValidator(tel_re, 'Enter a valid phone number (+xxxxxxxxxxx).', 'invalid')
+
+
 class SendForm(Form):
     gate_name = ChoiceField(
         choices=[(class_.name, class_.display_name) for class_ in SMSGate.get_options()],
@@ -19,7 +20,7 @@ class SendForm(Form):
     login = CharField()
     password = CharField()
     tel = CharField(validators=[validate_tel],
-                         label='Enter tel. no')
+                    label='Enter tel. no')
     text = CharField(widget=Textarea,
                      label='Enter text')
 
@@ -64,4 +65,3 @@ class MainView(FormView):
         }
         context = self.get_context_data(**context)
         return self.render_to_response(context)
-

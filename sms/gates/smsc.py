@@ -1,9 +1,7 @@
 import re
 import urllib.parse
-
 import requests
 from requests.exceptions import RequestException, HTTPError
-
 from sms.base import SMSGate
 
 
@@ -35,13 +33,13 @@ class SMSCGate(SMSGate):
         }
         try:
             resp = requests.get(
-                url=self.gate_url_template+'?'+urllib.parse.urlencode(params)
+                url=self.gate_url_template + '?' + urllib.parse.urlencode(params)
             )  # raises exception in case of some conection/pool failure
             if re.search('^[45]', str(resp.status_code)):
                 raise HTTPError(resp.status_code)  # raises exception in case of 4xx or 5xx HTTP response
             json = resp.json()
             if 'error' in json:
-                e =  HTTPError(  # raises exception if 200 OK but there is a problem in business logic
+                e = HTTPError(  # raises exception if 200 OK but there is a problem in business logic
                     '%s:\n%s' % (
                         self.error_descr.get(json['error_code']),
                         json.get('error')
@@ -53,4 +51,3 @@ class SMSCGate(SMSGate):
                 return json['id']
         except HTTPError as e:
             raise
-

@@ -1,11 +1,8 @@
 import pkgutil
-
 import re
 import urllib.parse
-
 import requests
 from requests.exceptions import RequestException, HTTPError
-
 from sms.models import MessageLog
 
 
@@ -13,7 +10,7 @@ class SMSGateMeta(type):
     registry = {}
 
     def __new__(mcs, object_or_name, bases, dict_):
-        abstract = dict_.pop('abstract', False) # abstract is not inherited
+        abstract = dict_.pop('abstract', False)  # abstract is not inherited
         if not abstract:
             if 'name' not in dict_:
                 raise ValueError('You must supply gate name in name class field')
@@ -39,7 +36,6 @@ class SMSGate(metaclass=SMSGateMeta):
     gate_url_template = None
     # Django tries to call x if x is callable, and class is callable of course, so we suppress this behaviour explicitly
     do_not_call_in_templates = True
-
 
     def __init__(self, login, password):
         self.login = login
@@ -80,11 +76,11 @@ class SMSGate(metaclass=SMSGateMeta):
         '''
         try:
             resp = requests.get(
-                url=self.gate_url_template+'?'+urllib.parse.urlencode(kwargs),
+                url=self.gate_url_template + '?' + urllib.parse.urlencode(kwargs),
             )  # raises exception in case of some conection/pool failure
             if re.search('^[45]', str(resp.status_code)):
                 raise HTTPError(resp.status_code)  # raises exception in case of 4xx or 5xx HTTP response
-            # no further error detection and no SMS id extraction
+                # no further error detection and no SMS id extraction
         except HTTPError as e:
             raise
 
